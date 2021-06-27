@@ -12,6 +12,8 @@ import java.util.UUID;
 @RequestMapping("/image")
 public class ImageController {
 
+    private ImageService imageService;
+
     @PostMapping("/batch")
     @ResponseStatus(HttpStatus.CREATED)
     public void batchUploadImages(@RequestParam("images") MultipartFile[] files) {
@@ -26,7 +28,7 @@ public class ImageController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteImage(@PathVariable("id") UUID imageId) {
-
+        imageService.deleteById(imageId);
     }
 
     @DeleteMapping("/purge")
