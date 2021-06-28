@@ -3,6 +3,7 @@ package bsa.java.concurrency.fs;
 
 import bsa.java.concurrency.image.ImageRepository;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +24,11 @@ import java.util.concurrent.Executors;
 public class FileSystemService implements FileSystem {
 
     private ImageRepository imageRepository;
+
+    @Autowired
+    public FileSystemService(ImageRepository imageRepository) {
+        this.imageRepository = imageRepository;
+    }
 
     private final int threadPoolNThreads = 2;
     //наскільки я зрозумів в даній частині коду я дозволюю працювати максимум 2'ом процесс таскам
@@ -51,7 +57,7 @@ public class FileSystemService implements FileSystem {
             pathToImage = Path.of(PATH + file.getOriginalFilename());
             out.flush();
             } catch (IOException ex) {
-                System.err.println(ex);
+                ex.printStackTrace();
         }
         //Як було би краще записати в String шлях до файла,
         //чи використовувати pathToImage.normalize.toString()
