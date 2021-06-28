@@ -1,6 +1,8 @@
 package bsa.java.concurrency.fs;
 
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 // Если вам интересно, почему файловая система предоставляет асинхронный интерфейс, хотя зачастую мы используем блокирующие вызовы к файловой системе, то ответ весьма прост:
@@ -8,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 // При работе с файловой системой вы можете использовать блокирующие вызовы, просто оберните результат в CompletableFuture
 public interface FileSystem {
 
-    CompletableFuture<String> saveImage(String path, byte[] file);
+    CompletableFuture<String> saveImage(MultipartFile file);
     void deleteAllImages();
     void deleteImageById(UUID imageId);
 

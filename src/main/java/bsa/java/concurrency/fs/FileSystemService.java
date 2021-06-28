@@ -5,9 +5,15 @@ import bsa.java.concurrency.image.ImageRepository;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
-import java.util.Optional;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -20,7 +26,7 @@ public class FileSystemService implements FileSystem {
 
     private final int threadPoolNThreads = 2;
     //наскільки я зрозумів в даній частині коду я дозволюю працювати максимум 2'ом процесс таскам
-    //але якщо їх більше то вони стають в чергу?
+    //але якщо їх більше, ніж 2 то вони стають в чергу?
     //не до кінця розумію як працює LinkedBlockingQueue,
     //бо наскільки я зрозумів саме цей класс відповідає за поставку потоків в чергу
     private final ExecutorService threadPool = Executors.newFixedThreadPool(threadPoolNThreads);
@@ -30,20 +36,35 @@ public class FileSystemService implements FileSystem {
     private static String PATH;
 
     @Override
-    public CompletableFuture<String> saveImage(String path, byte[] file) {
-        return CompletableFuture.supplyAsync(() -> save(), threadPool);
+    public CompletableFuture<String> saveImage(MultipartFile file) {
+        return CompletableFuture.supplyAsync(() -> saveImagesToFolder(file), threadPool);
     }
 
-    private String save() {
+    private String saveImagesToFolder(MultipartFile file)  {
+        Path pathToImage = Paths.get(PATH);
 
-        return null;
+        try {
+            //https://stackoverflow.com/questions/50551920/where-to-use-resolve-and-relativize-method-of-java-nio-file-path-class
+            var out = new BufferedOutputStream(Files.newOutputStream(pathToImage.resolve(Objects.requireNonNull(file.getOriginalFilename()))));
+            //https://www.baeldung.com/java-copy-file
+            out.write(file.getBytes());
+            pathToImage = Path.of(PATH + file.getOriginalFilename());
+            out.flush();
+            } catch (IOException ex) {
+                System.err.println(ex);
+        }
+        //Як було би краще записати в String шлях до файла,
+        //чи використовувати pathToImage.normalize.toString()
+        return pathToImage.toAbsolutePath().toString();
     }
+
 
     @Override
     public void deleteAllImages() {
         File dir = new File(FileSystemService.getPATH());
         File[] files = dir.listFiles();
 
+        assert files != null;
         for(File file : files) {
             if(!file.delete()){
                 System.out.println("File not delete: " + file.getAbsolutePath());

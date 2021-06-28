@@ -1,13 +1,13 @@
 package bsa.java.concurrency.image;
 
 import bsa.java.concurrency.image.dto.SearchResultDTO;
-import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/image")
@@ -15,22 +15,17 @@ public class ImageController {
 
     private ImageService imageService;
 
-    //TODO delete
-    @GetMapping("/hello") //for test api
-    public String hello(@RequestParam("name") String name) {
-        return "Hello: " + name;
-    }
 
     @PostMapping("/batch")
     @ResponseStatus(HttpStatus.CREATED)
-    public void batchUploadImages(@RequestParam("images") MultipartFile[] files) {
-        throw new IllegalArgumentException("not implemented");
+    public CompletableFuture<?> batchUploadImages(@RequestParam("images") MultipartFile[] files) {
+        return imageService.saveFile(files);
     }
 
     @PostMapping("/search")
     @ResponseStatus(HttpStatus.OK)
     public List<SearchResultDTO> searchMatches(@RequestParam("image") MultipartFile file, @RequestParam(value = "threshold", defaultValue = "0.9") double threshold) {
-        throw new IllegalArgumentException("not implemented");
+        return imageService.searchMatchesInFile(file, threshold);
     }
 
     @DeleteMapping("/{id}")
