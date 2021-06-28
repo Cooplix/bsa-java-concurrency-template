@@ -21,4 +21,9 @@ public class ImageService {
         fileSystemService.deleteImageById(imageId);
         imageRepository.deleteById(imageId);
     }
+
+    public void purgeImages() {
+        imageRepository.deleteAll();
+        fileSystemService.deleteAllImages();
+    }
 }
