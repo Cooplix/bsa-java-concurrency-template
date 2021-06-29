@@ -40,7 +40,7 @@ public class FileSystemService implements FileSystem {
     private final Path savePath = Paths.get('.' + File.separator + "images");
 
     @Getter
-    @Value("${path_to_file}")
+    @Value("${domain.path}")
     private String PATH;
 
     @Override

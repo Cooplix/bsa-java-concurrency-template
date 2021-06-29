@@ -2,7 +2,12 @@ package bsa.java.concurrency;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /*
 * Привет, внимательный читатель задания домашки :). Я - мини-гайд, который подскажет тебе как стоит подходить к решению домашки.
@@ -33,10 +38,16 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
 @EnableAsync
+@EnableSwagger2
 public class ConcurrencyApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ConcurrencyApplication.class, args);
+	}
+	@Bean
+	public Docket productApi() {
+		return new Docket(DocumentationType.SWAGGER_2).select()
+				.apis(RequestHandlerSelectors.basePackage("bsa.java.concurrency")).build();
 	}
 
 }
