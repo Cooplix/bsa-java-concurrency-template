@@ -1,6 +1,7 @@
 package bsa.java.concurrency.image;
 
 import bsa.java.concurrency.fs.FileSystemService;
+import bsa.java.concurrency.image.dto.ImageDto;
 import bsa.java.concurrency.image.dto.SearchResultDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,28 +36,26 @@ public class ImageService {
         fileSystemService.deleteAllImages();
     }
 
-    private byte[] getImgBytes(MultipartFile file) throws FileNotFoundException {
-        //на данний момент, я не придумав нічого кращого
-        //якщо можна буду вдячний за якись розвязок
-        try {
-            return file.getBytes();
-        } catch (IOException exception) {
-            exception.printStackTrace();
-        }
-        throw new FileNotFoundException();
-    }
 
-    public List<SearchResultDTO> searchMatchesInFile(MultipartFile file, double threshold) throws FileNotFoundException {
+    public List<SearchResultDTO> searchMatchesInFile(ImageDto imageDto, double threshold) {
 
-        long hash = dHasher.calculateHash(getImgBytes(file));
+        long hash = dHasher.calculateHash(imageDto.getImage());
         List<SearchResultDTO> resultDTOS = imageRepository.getMatch(hash, threshold);
 
 
         return resultDTOS;
+    }
+
+    public CompletableFuture<?> saveFile(List<ImageDto> files) {
+        return CompletableFuture.allOf(files
+                .parallelStream()
+                .map(this::saveToFileSystem)
+                .toArray(CompletableFuture[]::new));
+
         //throw new IllegalArgumentException("not implemented");
     }
 
-    public CompletableFuture<?> saveFile(MultipartFile[] files) {
-        throw new IllegalArgumentException("not implemented");
+    private CompletableFuture<Void> saveToFileSystem(ImageDto imageDto) {
+        var imgName = fileSystemService.saveImage((MultipartFile) imageDto);
     }
 }

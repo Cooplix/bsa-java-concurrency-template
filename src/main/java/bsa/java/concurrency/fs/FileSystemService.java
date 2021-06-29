@@ -2,6 +2,7 @@ package bsa.java.concurrency.fs;
 
 
 import bsa.java.concurrency.image.ImageRepository;
+import bsa.java.concurrency.image.dto.ImageDto;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,22 +40,22 @@ public class FileSystemService implements FileSystem {
 
     @Getter
     @Value("${path_to_file}")
-    private static String PATH;
+    private String PATH;
 
     @Override
-    public CompletableFuture<String> saveImage(MultipartFile file) {
-        return CompletableFuture.supplyAsync(() -> saveImagesToFolder(file), threadPool);
+    public CompletableFuture<String> saveImage(ImageDto imageDto) {
+        return CompletableFuture.supplyAsync(() -> saveImagesToFolder(imageDto), threadPool);
     }
 
-    private String saveImagesToFolder(MultipartFile file)  {
+    private String saveImagesToFolder(ImageDto imageDto)  {
         Path pathToImage = Paths.get(PATH);
 
         try {
             //https://stackoverflow.com/questions/50551920/where-to-use-resolve-and-relativize-method-of-java-nio-file-path-class
-            var out = new BufferedOutputStream(Files.newOutputStream(pathToImage.resolve(Objects.requireNonNull(file.getOriginalFilename()))));
+            var out = new BufferedOutputStream(Files.newOutputStream(pathToImage.resolve(Objects.requireNonNull(imageDto.getOriginalFilename()))));
             //https://www.baeldung.com/java-copy-file
-            out.write(file.getBytes());
-            pathToImage = Path.of(PATH + file.getOriginalFilename());
+            out.write(imageDto.getImage());
+            pathToImage = Path.of(PATH + imageDto.getOriginalFilename());
             out.flush();
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -67,7 +68,7 @@ public class FileSystemService implements FileSystem {
 
     @Override
     public void deleteAllImages() {
-        File dir = new File(FileSystemService.getPATH());
+        File dir = new File(getPATH());
         File[] files = dir.listFiles();
 
         assert files != null;

@@ -1,6 +1,7 @@
 package bsa.java.concurrency.fs;
 
 
+import bsa.java.concurrency.image.dto.ImageDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
@@ -10,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 // При работе с файловой системой вы можете использовать блокирующие вызовы, просто оберните результат в CompletableFuture
 public interface FileSystem {
 
-    CompletableFuture<String> saveImage(MultipartFile file);
+    CompletableFuture<String> saveImage(ImageDto imageDto);
     void deleteAllImages();
     void deleteImageById(UUID imageId);
 
