@@ -12,4 +12,5 @@ public interface ImageRepository extends JpaRepository<Image, UUID> {
     Image findOneById(UUID imageId);
 
     List<SearchResultDTO> getMatch(long hash, double threshold);
+
 }

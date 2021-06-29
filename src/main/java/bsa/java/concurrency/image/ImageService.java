@@ -5,19 +5,16 @@ import bsa.java.concurrency.image.dto.ImageDto;
 import bsa.java.concurrency.image.dto.SearchResultDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ImageService {
-    private FileSystemService fileSystemService;
-    private ImageRepository imageRepository;
-    private DHasher dHasher;
+    private final FileSystemService fileSystemService;
+    private final ImageRepository imageRepository;
+    private final DHasher dHasher;
 
     @Autowired
     public ImageService(FileSystemService fileSystemService, ImageRepository imageRepository, DHasher dHasher) {
@@ -49,13 +46,22 @@ public class ImageService {
     public CompletableFuture<?> saveFile(List<ImageDto> files) {
         return CompletableFuture.allOf(files
                 .parallelStream()
-                .map(this::saveToFileSystem)
+                .map(this::treatmentFile)
                 .toArray(CompletableFuture[]::new));
-
-        //throw new IllegalArgumentException("not implemented");
     }
 
-    private CompletableFuture<Void> saveToFileSystem(ImageDto imageDto) {
-        var imgName = fileSystemService.saveImage((MultipartFile) imageDto);
+    private CompletableFuture<Void> treatmentFile(ImageDto imageDto) {
+        var imgName = fileSystemService.saveImage(imageDto);
+        var hash = dHasher.calculateHash(imageDto.getImage());
+
+        return saveFileToFileSystem(imgName, hash);
+    }
+
+    private CompletableFuture<Void> saveFileToFileSystem(CompletableFuture<String> imgName, long hash) {
+        return imgName
+                .thenApply(path -> Image.builder()
+                        .hash(hash)
+                        .url(fileSystemService.getPATH().concat(path)).build())
+                .thenAccept(imageRepository::save);
     }
 }

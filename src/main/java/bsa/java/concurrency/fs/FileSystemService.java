@@ -4,6 +4,7 @@ package bsa.java.concurrency.fs;
 import bsa.java.concurrency.image.ImageRepository;
 import bsa.java.concurrency.image.dto.ImageDto;
 import lombok.Getter;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,25 +45,34 @@ public class FileSystemService implements FileSystem {
 
     @Override
     public CompletableFuture<String> saveImage(ImageDto imageDto) {
-        return CompletableFuture.supplyAsync(() -> saveImagesToFolder(imageDto), threadPool);
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return saveImagesToFolder(imageDto);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }, threadPool);
     }
 
-    private String saveImagesToFolder(ImageDto imageDto)  {
-        Path pathToImage = Paths.get(PATH);
+    private String saveImagesToFolder(ImageDto imageDto) throws IOException {
+        Path savePath = Paths.get('.' + File.separator + "images");
+
+        var pathToImage = savePath.resolve(
+                UUID.randomUUID().toString() + '.' + FilenameUtils.getExtension(imageDto.getNameImage()));
+
+        if(!Files.exists(savePath)) {
+            Files.createDirectories(savePath);
+        }
 
         try {
-            //https://stackoverflow.com/questions/50551920/where-to-use-resolve-and-relativize-method-of-java-nio-file-path-class
-            var out = new BufferedOutputStream(Files.newOutputStream(pathToImage.resolve(Objects.requireNonNull(imageDto.getOriginalFilename()))));
-            //https://www.baeldung.com/java-copy-file
+            var out = new BufferedOutputStream(Files.newOutputStream(pathToImage));
             out.write(imageDto.getImage());
-            pathToImage = Path.of(PATH + imageDto.getOriginalFilename());
             out.flush();
-            } catch (IOException ex) {
-                ex.printStackTrace();
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
-        //Як було би краще записати в String шлях до файла,
-        //чи використовувати pathToImage.normalize.toString()
-        return pathToImage.toAbsolutePath().toString();
+
+        return pathToImage.getFileName().toString();
     }
 
 
