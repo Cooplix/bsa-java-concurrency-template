@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -38,6 +37,7 @@ public class FileSystemService implements FileSystem {
     //не до кінця розумію як працює LinkedBlockingQueue,
     //бо наскільки я зрозумів саме цей класс відповідає за поставку потоків в чергу
     private final ExecutorService threadPool = Executors.newFixedThreadPool(threadPoolNThreads);
+    private final Path savePath = Paths.get('.' + File.separator + "images");
 
     @Getter
     @Value("${path_to_file}")
@@ -55,8 +55,6 @@ public class FileSystemService implements FileSystem {
     }
 
     private String saveImagesToFolder(ImageDto imageDto) throws IOException {
-        Path savePath = Paths.get('.' + File.separator + "images");
-
         var pathToImage = savePath.resolve(
                 UUID.randomUUID().toString() + '.' + imageDto.getExtension());
 

@@ -43,7 +43,7 @@ public class ImageService {
         return resultDTOS;
     }
 
-    public CompletableFuture<?> saveFile(List<ImageDto> files) {
+    public CompletableFuture<Void> saveFile(List<ImageDto> files) {
         return CompletableFuture.allOf(files
                 .parallelStream()
                 .map(this::treatmentFile)

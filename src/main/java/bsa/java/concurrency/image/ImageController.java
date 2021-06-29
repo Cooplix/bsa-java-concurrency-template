@@ -22,10 +22,10 @@ public class ImageController {
 
     @PostMapping("/batch")
     @ResponseStatus(HttpStatus.CREATED)
-    public CompletableFuture<?> batchUploadImages(@RequestParam("images") MultipartFile[] files) {
+    public CompletableFuture<Void> batchUploadImages(@RequestParam("images") MultipartFile[] files) {
         return imageService
-                .saveFile(Arrays.
-                        stream(files)
+                .saveFile(Arrays
+                        .stream(files)
                         .map(Mapper::imageToDto)
                         .collect(Collectors.toList()));
     }
