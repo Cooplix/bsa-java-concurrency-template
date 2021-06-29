@@ -58,7 +58,7 @@ public class FileSystemService implements FileSystem {
         Path savePath = Paths.get('.' + File.separator + "images");
 
         var pathToImage = savePath.resolve(
-                UUID.randomUUID().toString() + '.' + FilenameUtils.getExtension(imageDto.getNameImage()));
+                UUID.randomUUID().toString() + '.' + imageDto.getExtension());
 
         if(!Files.exists(savePath)) {
             Files.createDirectories(savePath);
