@@ -2,7 +2,6 @@ package bsa.java.concurrency.fs;
 
 
 import bsa.java.concurrency.image.dto.ImageDto;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;

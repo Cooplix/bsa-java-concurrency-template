@@ -4,11 +4,9 @@ package bsa.java.concurrency.fs;
 import bsa.java.concurrency.image.ImageRepository;
 import bsa.java.concurrency.image.dto.ImageDto;
 import lombok.Getter;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -40,7 +38,7 @@ public class FileSystemService implements FileSystem {
     private final Path savePath = Paths.get('.' + File.separator + "images");
 
     @Getter
-    @Value("${domain.path}")
+    @Value("${spring.resources.static-locations}")
     private String PATH;
 
     @Override

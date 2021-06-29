@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ImageDto {
-    //клас на майбутнє
     private byte[] image;
 
     private String extension;

@@ -4,6 +4,7 @@ import bsa.java.concurrency.fs.FileSystemService;
 import bsa.java.concurrency.image.dto.ImageDto;
 import bsa.java.concurrency.image.dto.SearchResultDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +16,9 @@ public class ImageService {
     private final FileSystemService fileSystemService;
     private final ImageRepository imageRepository;
     private final DHasher dHasher;
+
+    @Value("${domain.path}")
+    private String domain;
 
     @Autowired
     public ImageService(FileSystemService fileSystemService, ImageRepository imageRepository, DHasher dHasher) {
@@ -61,7 +65,7 @@ public class ImageService {
         return imgName
                 .thenApply(path -> Image.builder()
                         .hash(hash)
-                        .url(fileSystemService.getPATH().concat(path)).build())
+                        .url(domain.concat(path)).build())
                 .thenAccept(imageRepository::save);
     }
 }
