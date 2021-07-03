@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.3.1.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
 	id 'java'
+	id "org.flywaydb.flyway" version "7.11.0"
 }
 
 group = 'bsa.java'
@@ -18,6 +19,8 @@ repositories {
 	mavenCentral()
 }
 
+
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -25,11 +28,13 @@ dependencies {
 	implementation 'commons-io:commons-io:2.6'
 
 
+
 	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
 	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
 	compile("org.springframework.boot:spring-boot-devtools")
 
 	compileOnly 'org.projectlombok:lombok'
+	compile "org.flywaydb:flyway-core:7.11.0"
 	annotationProcessor 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
@@ -39,4 +44,10 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+}
+
+flyway {
+	url = 'jdbc:postgresql://localhost:5432/spring-concurrency'
+	user = 'postgres'
+	password = 'admin'
 }
